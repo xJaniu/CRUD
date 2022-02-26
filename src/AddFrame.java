@@ -5,6 +5,15 @@ import java.awt.event.ActionListener;
 
 public class AddFrame extends JFrame implements Runnable {
 
+    JButton submitButton = new JButton("submit");
+    JButton exitButton = new JButton("close");
+
+    JLabel bookNameText = new JLabel("Book name:");
+    JLabel bookQuantityText = new JLabel("Book quantity:");
+
+    JTextField bookName = new JTextField("Book name", 25);
+    JTextField bookQuantity = new JTextField("0", 16);
+
     public AddFrame(String title){
         super(title);
         setLocationRelativeTo(null);
@@ -13,24 +22,29 @@ public class AddFrame extends JFrame implements Runnable {
         setVisible(true);
         setLayout(null);
 
-        JButton submitButton = new JButton("submit");
-        add(submitButton);
+        exitButton.setBounds(200,175,80,25);
         submitButton.setBounds(100,175,80,25);
 
-        JButton exitButton = new JButton("close");
         add(exitButton);
-        exitButton.setBounds(200,175,80,25);
+        add(submitButton);
 
         exitButton.addActionListener(c -> {
             dispose();
         });
 
-        JTextField textField = new JTextField();
-        textField.setText("This is a text");
-        textField.setColumns(20);
+        bookName.setBounds(120,20,150,25);
+        bookQuantity.setBounds(120,50,150,25);
 
+        add(bookName);
+        add(bookQuantity);
 
+        bookNameText.setBounds(20,20,150,25);
+        bookQuantityText.setBounds(20,50,150,25);
 
+        add(bookNameText);
+        add(bookQuantityText);
+
+        submitButton.addActionListener(new ActionListenerAddBook(bookName.getText(), bookQuantity.getText()));
 
 
         setVisible(true);

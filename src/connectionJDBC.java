@@ -23,7 +23,8 @@ public class connectionJDBC {
             String tab1 = "CREATE TABLE if not exists books (" +
                     "    id_book INTEGER   PRIMARY KEY AUTOINCREMENT" +
                     "                    NOT NULL," +
-                    "    name TEXT (32) NOT NULL" +
+                    "    name TEXT (32) NOT NULL," +
+                    "    quantity INTEGER       NOT NULL" +
                     ");";
 
             stmt.execute(tab1);
