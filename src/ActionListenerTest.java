@@ -18,6 +18,8 @@ public class ActionListenerTest extends JButton implements ActionListener {
 
             while(test.next()){
                 String test2 = test.getString("name");
+                System.out.printf("Nazwa: " + test2 + " | ilość: ");
+                test2 = test.getString("quantity");
                 System.out.printf(test2 + " \n");
             }
 

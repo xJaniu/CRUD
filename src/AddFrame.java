@@ -2,6 +2,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 public class AddFrame extends JFrame implements Runnable {
 
@@ -11,7 +15,7 @@ public class AddFrame extends JFrame implements Runnable {
     JLabel bookNameText = new JLabel("Book name:");
     JLabel bookQuantityText = new JLabel("Book quantity:");
 
-    JTextField bookName = new JTextField("Book name", 25);
+    JTextField bookName = new JTextField("book name", 24);;
     JTextField bookQuantity = new JTextField("0", 16);
 
     public AddFrame(String title){
@@ -28,7 +32,7 @@ public class AddFrame extends JFrame implements Runnable {
         add(exitButton);
         add(submitButton);
 
-        exitButton.addActionListener(c -> {
+        exitButton.addActionListener(a -> {
             dispose();
         });
 
@@ -44,11 +48,19 @@ public class AddFrame extends JFrame implements Runnable {
         add(bookNameText);
         add(bookQuantityText);
 
-        submitButton.addActionListener(new ActionListenerAddBook(bookName.getText(), bookQuantity.getText()));
+        //submitButton.addActionListener(new ActionListenerAddBook());
 
+        submitButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent ae){
+                int quantity = Integer.parseInt(bookQuantity.getText());
+                new ActionListenerAddBook(bookName.getText(), quantity);
+            }
+        });
 
         setVisible(true);
     }
+
+
     @Override
     public void run() {
     };
