@@ -1,26 +1,31 @@
 import javax.swing.*;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.awt.*;
+import java.sql.*;
 
 public class EditBookFrame extends JFrame {
 
-    private final String name;
-    private final int quantity;
-    JButton exitButton = new JButton("back");
-    JButton editButton = new JButton("edit");
+    String name;
+    int quantity;
+
+    JButton changeNameButton = new JButton("Change name");
+    JButton changeQuantityButton = new JButton("Change quantity");
+    JButton exitButton = new JButton("Back");
+
 
     JLabel actualName = new JLabel();
     JLabel newName = new JLabel();
     JLabel actualQuantity = new JLabel();
     JLabel newQuantity = new JLabel();
 
+    JTextField newBookName;
+    JTextField newBookQuantity;
 
-    public EditBookFrame(String title, String name, String quantity){
+    JPanel optionsPanel = new JPanel(new FlowLayout());
+
+    public EditBookFrame(String title, String name, int quantity){
         super(title);
         this.name = name;
-        this.quantity = Integer.parseInt(quantity);
+        this.quantity = quantity;
         setSize(640,480);
         setResizable(false);
         setLocationRelativeTo(null);
@@ -40,23 +45,29 @@ public class EditBookFrame extends JFrame {
         add(actualQuantity);
         add(newQuantity);
 
-
-        JTextField newBookName = new JTextField(name, 24);;
-        JTextField newBookQuantity = new JTextField(quantity, 16);
-
+        newBookName = new JTextField(name, 24);
+        newBookQuantity = new JTextField(Integer.toString(quantity), 16);
         newBookName.setBounds(135,60,250,25);
         newBookQuantity.setBounds(135,120,250,25);
-
         add(newBookName);
         add(newBookQuantity);
 
-        exitButton.setBounds(350,375,80,25);
-        editButton.setBounds(200,375,80,25);
+        changeNameButton.addActionListener(b -> {
+                EditName(newBookName.getText(), name);
+                dispose();
+                new EditBookFrame(title, newBookName.getText(), quantity).setVisible(true);
+        });
 
-        editButton.addActionListener(b -> {
-            EditBook(newBookName.getText(), newBookQuantity.getText(), name);
-            JOptionPane.showMessageDialog(new JFrame(), "Book " + name + " changed to " + newBookName.getText() + "!", "Alert",
-                    JOptionPane.INFORMATION_MESSAGE);
+        changeQuantityButton.addActionListener(b -> {
+            try{
+                int newQuantity = Integer.parseInt(newBookQuantity.getText());
+                EditQuantity(newQuantity, name);
+                dispose();
+                new EditBookFrame(title, name, newQuantity).setVisible(true);
+            }catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(new JFrame(), "Quantity must be a number", "Alert",
+                        JOptionPane.INFORMATION_MESSAGE);
+            }
         });
 
         exitButton.addActionListener(a -> {
@@ -68,18 +79,51 @@ public class EditBookFrame extends JFrame {
             }
         });
 
-        add(exitButton);
-        add(editButton);
+        optionsPanel.setBounds(0,400,640,35);
+        optionsPanel.add(changeNameButton);
+        optionsPanel.add(changeQuantityButton);
+        optionsPanel.add(exitButton);
+        add(optionsPanel);
+
         setVisible(true);
     }
 
-    public void EditBook(String bookName, String bookQuantity, String oldName){
+    public void EditName(String bookName, String oldName){
 
         try {
             Connection conn = DriverManager.getConnection("JDBC:SQLite:library.db");
             Statement stmt = conn.createStatement();
-            String insert = "UPDATE books SET name='" + bookName + "', quantity=" + bookQuantity + " WHERE name = '" + oldName + "';";
+
+            String check = "SELECT name FROM books WHERE name ='" + bookName + "';";
+            stmt.execute(check);
+            ResultSet result = stmt.executeQuery(check);
+
+            if(result.next()){
+                JOptionPane.showMessageDialog(new JFrame(), "Book already exist", "Alert",
+                        JOptionPane.INFORMATION_MESSAGE);
+            }else {
+                String insert = "UPDATE books SET name='" + bookName + "' WHERE name = '" + oldName + "';";
+                stmt.execute(insert);
+                JOptionPane.showMessageDialog(new JFrame(), "Book " + name + " changed to " + newBookName.getText() + "!", "Alert",
+                        JOptionPane.INFORMATION_MESSAGE);
+            }
+            stmt.close();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+    }
+
+    public void EditQuantity(int bookQuantity, String bookName) {
+        try {
+            Connection conn = DriverManager.getConnection("JDBC:SQLite:library.db");
+            Statement stmt = conn.createStatement();
+            String insert = "UPDATE books SET quantity=" + bookQuantity + " WHERE name = '" + bookName + "';";
             stmt.execute(insert);
+            JOptionPane.showMessageDialog(new JFrame(), "Book " + name + " changed quantity to " + bookQuantity + "!", "Alert",
+                    JOptionPane.INFORMATION_MESSAGE);
+
+
+
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
